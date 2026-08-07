@@ -14,6 +14,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - dev
   db:
     image: postgres:15-alpine
     container_name: wmanager_db_dev
@@ -29,6 +31,13 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    networks:
+      - dev
+
+
+networks:
+  dev:
+    driver: bridge
 
 volumes:
   pg_data:

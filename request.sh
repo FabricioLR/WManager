@@ -18,7 +18,7 @@ curl -X POST "http://127.0.0.1:8000/api/whatsapp/webhook" \
             "contacts": [
               {
                 "profile": {
-                  "name": "Sheena Nelson"
+                  "name": "Sheena Nelson2"
                 },
                 "wa_id": "16505551234"
               }
@@ -26,11 +26,11 @@ curl -X POST "http://127.0.0.1:8000/api/whatsapp/webhook" \
             "messages": [
               {
                 "from": "16505551234",
-                "id": "wamid.HBgLMTY1MDM4Nzk0MzkVAgASGBQzQTRBNjU5OUFFRTAzODEwMTQ0RgA=",
+                "id": "wamid.HBgLMTY1MDM4Nzk0MzkVAgASGBQzQTRBNjU5OUFFRTAzODEwMTQ0RgC=",
                 "timestamp": "1749416383",
                 "type": "text",
                 "text": {
-                  "body": "Does it come in another color?"
+                  "body": "teste"
                 }
               }
             ]

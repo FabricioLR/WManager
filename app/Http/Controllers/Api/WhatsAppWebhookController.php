@@ -12,10 +12,8 @@ class WhatsAppWebhookController extends Controller
     {
         $payload = $request->all();
 
-        if (isset($payload['entry'][0]['changes'][0]['value']['messages'])) {
-            ProcessWhatsAppMessage::dispatch($payload);
-        }
-
+        ProcessWhatsAppMessage::dispatch($payload);
+        
         return response()->json(['status' => 'EVENT_RECEIVED'], 200);
     }
 }

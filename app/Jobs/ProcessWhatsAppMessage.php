@@ -42,8 +42,6 @@ class ProcessWhatsAppMessage implements ShouldQueue
         $body = null;
         if ($messageData['type'] === 'text') {
             $body = $messageData['text']['body'] ?? '';
-        } elseif (isset($messageData[$messageData['type']]['caption'])) {
-            $body = $messageData[$messageData['type']]['caption'];
         } else {
             $body = '[' . ucfirst($messageData['type']) . ' Message]';
         }
