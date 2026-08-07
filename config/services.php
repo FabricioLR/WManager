@@ -14,6 +14,16 @@ return [
     |
     */
 
+    'api' => [
+        'secret_token' => env('API_SECRET_TOKEN', ''),
+    ],
+
+    'whatsapp' => [
+        'phone_number_id' => env('WHATSAPP_PHONE_ID', ''),
+        'access_token'    => env('WHATSAPP_ACCESS_TOKEN', ''),
+        'api_version'         => env('WHATSAPP_API_VERSION', 'v26.0'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

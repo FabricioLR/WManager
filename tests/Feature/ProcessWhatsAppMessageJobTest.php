@@ -1,6 +1,6 @@
 <?php
 
-use App\Jobs\ProcessWhatsAppMessage;
+use App\Jobs\ProcessWhatsAppWebhookMessage;
 use App\Models\Contact;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -37,7 +37,7 @@ test('stores contact and text message in database', function () {
         ],
     ];
 
-    (new ProcessWhatsAppMessage($payload))->handle();
+    (new ProcessWhatsAppWebhookMessage($payload))->handle();
 
     $this->assertDatabaseHas('contacts', [
         'wa_id' => '5561999999999',
@@ -89,8 +89,8 @@ test('updates contact and ignores duplicate messages', function () {
         ],
     ];
 
-    (new ProcessWhatsAppMessage($payload))->handle();
-    (new ProcessWhatsAppMessage($payload))->handle();
+    (new ProcessWhatsAppWebhookMessage($payload))->handle();
+    (new ProcessWhatsAppWebhookMessage($payload))->handle();
 
     expect($contact->fresh()->name)->toBe('Updated Name');
 
