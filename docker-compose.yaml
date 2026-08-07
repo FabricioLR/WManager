@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+      dockerfile: docker/Dockerfile
+    container_name: wmanager_app_dev
+    command: sh -c "php artisan key:generate && php artisan migrate --seed && php artisan serve --host=0.0.0.0 --port=8000"
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    volumes:
+      - .:/var/www
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:15-alpine
+    container_name: wmanager_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-dev}
+      POSTGRES_USER: ${DB_USERNAME:-dev}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dev}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-dev}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_data:
