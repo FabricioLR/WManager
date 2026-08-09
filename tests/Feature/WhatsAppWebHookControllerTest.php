@@ -1,10 +1,12 @@
 <?php
 
-use App\Jobs\ProcessWhatsAppWebhookMessage;
+use App\Jobs\ProcessWebhookPayload;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
 function validWhatsAppPayload(): array
 {
     return [
@@ -64,7 +66,7 @@ test('dispatches job and returns 200 when webhook request is valid', function ()
     $response->assertStatus(200)
         ->assertJson(['status' => 'EVENT_RECEIVED']);
 
-    Queue::assertPushed(ProcessWhatsAppWebhookMessage::class, function ($job) use ($payload) {
+    Queue::assertPushed(ProcessWebhookPayload::class, function ($job) use ($payload) {
         return $job->payload === $payload;
     });
 });

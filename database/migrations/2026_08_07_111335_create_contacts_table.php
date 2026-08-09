@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->string('wa_id')->unique();
             $table->string('name')->nullable();
             $table->string('phone_number')->nullable();
-            $table->timestamp('last_message_at')->nullable();
+            $table->timestamp('last_message_from_contact_at')->nullable();
             $table->timestamps();
         });
     }

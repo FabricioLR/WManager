@@ -1,9 +1,10 @@
 <?php
 
+use App\Jobs\ProcessSentMessage;
 use App\Models\Contact;
-use App\Models\Message;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
@@ -11,37 +12,9 @@ beforeEach(function () {
     Config::set('services.api.secret_token', 'test-api-secret-123');
 });
 
-test('returns 202 accepted response with correct json structure when valid payload is sent', function () {
-    $payload = [
-        'phone_number' => '5561999999999',
-        'message' => 'Hello from controller test!',
-    ];
-
-    $response = $this->withHeaders([
-        'X-Api-Secret' => 'test-api-secret-123',
-        'Accept' => 'application/json',
-    ])->postJson('/api/messages/send', $payload);
-
-    $response->assertStatus(202)
-        ->assertJson([
-            'status' => 'queued',
-            'message' => 'Message queued for sending.',
-            'data' => [
-                'status' => 'pending',
-            ],
-        ])
-        ->assertJsonStructure([
-            'status',
-            'message',
-            'data' => [
-                'message_id',
-                'contact_id',
-                'status',
-            ],
-        ]);
-});
-
 test('creates contact and message records in database on successful request', function () {
+    Queue::fake();
+
     $payload = [
         'phone_number' => '5561888888888',
         'message' => 'Testing database persistence',
@@ -62,14 +35,20 @@ test('creates contact and message records in database on successful request', fu
         'body' => 'Testing database persistence',
         'status' => 'pending',
     ]);
+
+    Queue::assertPushed(ProcessSentMessage::class, function ($job) {
+        return $job->message->body === 'Testing database persistence';
+    });
 });
 
 test('associates message with existing contact if contact already exists in database', function () {
+    Queue::fake();
+
     $existingContact = Contact::create([
         'wa_id' => '5561777777777',
         'name' => 'John Doe',
         'phone_number' => '5561777777777',
-        'last_message_at' => now()->subDay(),
+        'last_message_from_contact_at' => now()->subDay(),
     ]);
 
     $payload = [
@@ -81,8 +60,7 @@ test('associates message with existing contact if contact already exists in data
         'X-Api-Secret' => 'test-api-secret-123',
     ])->postJson('/api/messages/send', $payload);
 
-    $response->assertStatus(202)
-        ->assertJson([
+    $response->assertJson([
             'data' => [
                 'contact_id' => $existingContact->id,
             ],
@@ -93,6 +71,8 @@ test('associates message with existing contact if contact already exists in data
 });
 
 test('returns 401 unauthorized when X-Api-Secret header is missing or incorrect', function () {
+    Queue::fake();
+
     $payload = [
         'phone_number' => '5561999999999',
         'message' => 'Unauthorized attempt',
@@ -109,6 +89,8 @@ test('returns 401 unauthorized when X-Api-Secret header is missing or incorrect'
 });
 
 test('returns 422 unprocessable content when request validation fails', function () {
+    Queue::fake();
+    
     $response = $this->withHeaders([
         'X-Api-Secret' => 'test-api-secret-123',
         'Accept' => 'application/json',

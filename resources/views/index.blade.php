@@ -73,7 +73,7 @@
                             <div class="flex justify-between items-baseline">
                                 <h3 class="text-sm font-semibold text-gray-900 truncate">{{ $c->name ?? $c->phone_number }}</h3>
                                 <span class="text-[11px] text-gray-400 flex-shrink-0 ml-2">
-                                    {{ $c->last_message_at ? $c->last_message_at->format('H:i') : '' }}
+                                    {{ $c->last_message_from_contact_at ? $c->last_message_from_contact_at->format('H:i') : '' }}
                                 </span>
                             </div>
                             <p class="text-xs text-gray-500 truncate mt-1">

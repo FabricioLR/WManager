@@ -17,14 +17,9 @@ class SendMessageService
             ['wa_id' => $phoneNumber],
             [
                 'name' => $phoneNumber,
-                'phone_number' => $phoneNumber,
-                'last_message_at' => $now,
+                'phone_number' => $phoneNumber
             ]
         );
-
-        if (!$contact->wasRecentlyCreated) {
-            $contact->update(['last_message_at' => $now]);
-        }
 
         $tempWamid = 'outbound_temp_' . Str::uuid();
 

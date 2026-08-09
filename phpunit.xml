@@ -37,5 +37,10 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+
+        <env name="API_SECRET_TOKEN" value="test"/>
+        <env name="WHATSAPP_API_VERSION" value="v26.0"/>
+        <env name="WHATSAPP_PHONE_ID" value="test"/>
+        <env name="WHATSAPP_ACCESS_TOKEN" value="test"/>
     </php>
 </phpunit>

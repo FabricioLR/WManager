@@ -11,7 +11,7 @@ class ChatController extends Controller
         $contacts = Contact::with(['messages' => function ($query) {
             $query->latest('timestamp')->limit(1);
         }])
-        ->orderByDesc('last_message_at')
+        ->orderByDesc('last_message_from_contact_at')
         ->get();
 
         return view('index', compact('contacts'));
@@ -22,7 +22,7 @@ class ChatController extends Controller
         $contacts = Contact::with(['messages' => function ($query) {
             $query->latest('timestamp')->limit(1);
         }])
-        ->orderByDesc('last_message_at')
+        ->orderByDesc('last_message_from_contact_at')
         ->get();
 
         $messages = $contact->messages()->get();

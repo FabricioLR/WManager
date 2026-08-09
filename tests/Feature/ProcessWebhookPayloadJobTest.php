@@ -1,12 +1,13 @@
 <?php
 
-use App\Jobs\ProcessWhatsAppWebhookMessage;
+use App\Jobs\ProcessWebhookPayload;
 use App\Models\Contact;
+use App\Models\Message;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('stores contact and text message in database', function () {
+test('stores contact and text message in database when type of payload is message', function () {
     $payload = [
         'entry' => [
             [
@@ -37,7 +38,7 @@ test('stores contact and text message in database', function () {
         ],
     ];
 
-    (new ProcessWhatsAppWebhookMessage($payload))->handle();
+    (new ProcessWebhookPayload($payload))->handle();
 
     $this->assertDatabaseHas('contacts', [
         'wa_id' => '5561999999999',
@@ -54,7 +55,7 @@ test('stores contact and text message in database', function () {
     ]);
 });
 
-test('updates contact and ignores duplicate messages', function () {
+test('updates contact and ignores duplicate messages when type of payload is message', function () {
     $contact = Contact::create([
         'wa_id' => '5561999999999',
         'name' => 'Old Name',
@@ -89,10 +90,64 @@ test('updates contact and ignores duplicate messages', function () {
         ],
     ];
 
-    (new ProcessWhatsAppWebhookMessage($payload))->handle();
-    (new ProcessWhatsAppWebhookMessage($payload))->handle();
+    (new ProcessWebhookPayload($payload))->handle();
+    (new ProcessWebhookPayload($payload))->handle();
 
     expect($contact->fresh()->name)->toBe('Updated Name');
 
     $this->assertDatabaseCount('messages', 1);
+});
+
+test('updates message status when type of payload is statuses', function () {
+    $contact = Contact::create([
+        'wa_id' => '5561999999999',
+        'name' => 'Old Name',
+        'phone_number' => '5561999999999',
+    ]);
+
+    $message  = Message::create([
+        'contact_id' => $contact->id,
+        'wamid' => 'wamid.TEST_ID_12345',
+        'direction' => 'outbound',
+        'type' => 'text',
+        'body' => 'Hello from Pest test!',
+        'timestamp'  => '1700000000',
+        'status' => 'sending',
+    ]);
+
+    $payload = [
+        'entry' => [
+            [
+                'changes' => [
+                    [
+                        'value' => [
+                            'contacts' => [
+                                [
+                                    'profile' => ['name' => 'John Doe'],
+                                    'wa_id' => '5561999999999',
+                                ],
+                            ],
+                            'statuses' => [
+                                [
+                                    'recipient_id' => '5561999999999',
+                                    'id' => 'wamid.TEST_ID_12345',
+                                    'status' => 'sent',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    (new ProcessWebhookPayload($payload))->handle();
+
+    $this->assertDatabaseHas('messages', [
+        'wamid' => 'wamid.TEST_ID_12345',
+        'direction' => 'outbound',
+        'type' => 'text',
+        'body' => 'Hello from Pest test!',
+        'status' => 'sent',
+    ]);
 });

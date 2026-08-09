@@ -24,8 +24,13 @@ class ProcessSentMessage implements ShouldQueue
         $accessToken = config('services.whatsapp.access_token', env("WHATSAPP_ACCESS_TOKEN"));
         $apiVersion = config('services.whatsapp.api_version', env("WHATSAPP_API_VERSION", 'v26.0'));
 
-        $isWithin24Hours = $contact->last_message_at && 
-            $contact->last_message_at->greaterThanOrEqualTo(now()->subHours(24));
+        if (!$phoneNumberId || !$accessToken) {
+            Log::error("WhatsApp API credentials are not set.");
+            return;
+        }
+
+        $isWithin24Hours = $contact->last_message_from_contact_at && 
+            $contact->last_message_from_contact_at->greaterThanOrEqualTo(now()->subHours(24));
 
         if ($isWithin24Hours) {
             $payload = [
@@ -45,7 +50,7 @@ class ProcessSentMessage implements ShouldQueue
                 'to'                => $phoneNumber,
                 'type'              => 'template',
                 'template'          => [
-                    'name'     => config('services.whatsapp.default_template', 'hello_world'),
+                    'name'     => 'hello_world',
                     'language' => [
                         'code' => 'en_US',
                     ],
@@ -53,7 +58,11 @@ class ProcessSentMessage implements ShouldQueue
             ];
         }
 
-        $response = Http::timeout(15)->retry(3, 100)->withToken($accessToken)
+        $response = Http::timeout(15)
+            ->retry(3, 100, when: function ($exception) {
+                return $exception instanceof ConnectionException || 
+                        ($exception instanceof RequestException && $exception->response?->serverError());
+            }, throw: false)->withToken($accessToken)
             ->post("https://graph.facebook.com/{$apiVersion}/{$phoneNumberId}/messages", $payload);
 
         if ($response->successful()) {
@@ -62,12 +71,11 @@ class ProcessSentMessage implements ShouldQueue
 
             $this->message->update([
                 'wamid'  => $officialWamid ?? $this->message->wamid,
-                'status' => 'sent',
+                'status' => 'sending',
             ]);
 
             Log::info("WhatsApp outbound message sent successfully.", [
                 'message_id'       => $this->message->id,
-                'is_within_24h'    => $isWithin24Hours,
                 'wamid'            => $officialWamid,
             ]);
         } else {

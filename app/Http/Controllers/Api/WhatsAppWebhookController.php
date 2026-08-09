@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessWhatsAppWebhookMessage;
+use App\Jobs\ProcessWebhookPayload;
 use Illuminate\Http\Request;
 
 class WhatsAppWebhookController extends Controller
@@ -12,7 +12,7 @@ class WhatsAppWebhookController extends Controller
     {
         $payload = $request->all();
 
-        ProcessWhatsAppWebhookMessage::dispatch($payload);
+        ProcessWebhookPayload::dispatch($payload);
         
         return response()->json(['status' => 'EVENT_RECEIVED'], 200);
     }
