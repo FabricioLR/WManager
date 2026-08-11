@@ -13,12 +13,14 @@ class Message extends Model
         'direction',
         'type',
         'body',
+        'payload',
         'timestamp',
         'status',
     ];
 
     protected $casts = [
         'timestamp' => 'datetime',
+        'payload' => 'array',
     ];
 
     public function contact(): BelongsTo

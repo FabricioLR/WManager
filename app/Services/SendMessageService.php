@@ -11,8 +11,40 @@ class SendMessageService
 {
     public function send(string $phoneNumber, string $body): Message
     {
-        $now = now();
-        
+        return $this->createAndDispatchMessage(
+            phoneNumber: $phoneNumber,
+            type: 'text',
+            body: $body
+        );
+    }
+
+    public function sendTemplate(
+        string $phoneNumber, 
+        string $templateName, 
+        string $languageCode = 'en_US', 
+        array $components = [],
+        ?string $fallbackBody = null
+    ): Message {
+        $payload = [
+            'name' => $templateName,
+            'language' => ['code' => $languageCode],
+            'components' => $components,
+        ];
+
+        return $this->createAndDispatchMessage(
+            phoneNumber: $phoneNumber,
+            type: 'template',
+            body: $fallbackBody ?? "Template: {$templateName}",
+            payload: $payload
+        );
+    }
+
+    private function createAndDispatchMessage(
+        string $phoneNumber, 
+        string $type, 
+        string $body, 
+        ?array $payload = null
+    ): Message {
         $contact = Contact::firstOrCreate(
             ['wa_id' => $phoneNumber],
             [
@@ -21,15 +53,14 @@ class SendMessageService
             ]
         );
 
-        $tempWamid = 'outbound_temp_' . Str::uuid();
-
         $message = Message::create([
             'contact_id' => $contact->id,
-            'wamid'      => $tempWamid,
+            'wamid'      => 'outbound_temp_' . Str::uuid(),
             'direction'  => 'outbound',
-            'type'       => 'text',
+            'type'       => $type,
             'body'       => $body,
-            'timestamp'  => $now,
+            'payload'    => $payload,
+            'timestamp'  => now(),
             'status'     => 'pending',
         ]);
 

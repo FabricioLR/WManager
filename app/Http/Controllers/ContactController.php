@@ -19,7 +19,7 @@ class ContactController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'phone_number' => 'required|string',
+            'phone_number' => ['required', 'string', 'regex:/^[0-9]{10,15}$/'],
         ]);
 
         try {

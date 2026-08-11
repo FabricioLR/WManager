@@ -12,8 +12,9 @@ return new class extends Migration {
             $table->foreignId('contact_id')->constrained()->cascadeOnDelete();
             $table->string('wamid')->unique();
             $table->enum('direction', ['inbound', 'outbound'])->default('inbound');
-            $table->string('type')->default('text');
+            $table->string('type')->default('text'); 
             $table->text('body')->nullable();
+            $table->json('payload')->nullable()->after('body');
             $table->timestamp('timestamp');
             $table->string('status')->default('received');
             $table->timestamps();

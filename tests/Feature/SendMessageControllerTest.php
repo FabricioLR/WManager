@@ -12,7 +12,7 @@ beforeEach(function () {
     Config::set('services.api.secret_token', 'test-api-secret-123');
 });
 
-test('creates contact and message records in database on successful request', function () {
+test('creates contact and text message record on successful send request', function () {
     Queue::fake();
 
     $payload = [
@@ -20,9 +20,15 @@ test('creates contact and message records in database on successful request', fu
         'message' => 'Testing database persistence',
     ];
 
-    $this->withHeaders([
+    $response = $this->withHeaders([
         'X-Api-Secret' => 'test-api-secret-123',
     ])->postJson('/api/messages/send', $payload);
+
+    $response->assertStatus(202)
+        ->assertJson([
+            'status' => 'queued',
+            'message' => 'Message queued for sending.',
+        ]);
 
     $this->assertDatabaseHas('contacts', [
         'wa_id' => '5561888888888',
@@ -37,11 +43,51 @@ test('creates contact and message records in database on successful request', fu
     ]);
 
     Queue::assertPushed(ProcessSentMessage::class, function ($job) {
-        return $job->message->body === 'Testing database persistence';
+        return $job->message->body === 'Testing database persistence' && $job->message->type === 'text';
     });
 });
 
-test('associates message with existing contact if contact already exists in database', function () {
+test('creates template message record and dispatches job on sendTemplate request', function () {
+    Queue::fake();
+
+    $payload = [
+        'phone_number' => '5561999999999',
+        'template_name' => 'order_update',
+        'language_code' => 'en_US',
+        'components' => [
+            [
+                'type' => 'body',
+                'parameters' => [
+                    ['type' => 'text', 'text' => 'John Doe'],
+                ],
+            ],
+        ],
+    ];
+
+    $response = $this->withHeaders([
+        'X-Api-Secret' => 'test-api-secret-123',
+    ])->postJson('/api/messages/sendTemplate', $payload);
+
+    $response->assertStatus(202)
+        ->assertJson([
+            'status' => 'queued',
+            'message' => 'Message queued for sending.',
+        ]);
+
+    $this->assertDatabaseHas('messages', [
+        'direction' => 'outbound',
+        'type' => 'template',
+        'body' => 'Template: order_update',
+        'status' => 'pending',
+    ]);
+
+    Queue::assertPushed(ProcessSentMessage::class, function ($job) {
+        return $job->message->type === 'template' &&
+               $job->message->payload['name'] === 'order_update';
+    });
+});
+
+test('associates message with existing contact if contact exists', function () {
     Queue::fake();
 
     $existingContact = Contact::create([
@@ -61,16 +107,16 @@ test('associates message with existing contact if contact already exists in data
     ])->postJson('/api/messages/send', $payload);
 
     $response->assertJson([
-            'data' => [
-                'contact_id' => $existingContact->id,
-            ],
-        ]);
+        'data' => [
+            'contact_id' => $existingContact->id,
+        ],
+    ]);
 
     $this->assertDatabaseCount('contacts', 1);
     $this->assertDatabaseCount('messages', 1);
 });
 
-test('returns 401 unauthorized when X-Api-Secret header is missing or incorrect', function () {
+test('returns 401 unauthorized when X-Api-Secret header is invalid', function () {
     Queue::fake();
 
     $payload = [
@@ -78,8 +124,7 @@ test('returns 401 unauthorized when X-Api-Secret header is missing or incorrect'
         'message' => 'Unauthorized attempt',
     ];
 
-    $this->postJson('/api/messages/send', $payload)
-        ->assertStatus(401);
+    $this->postJson('/api/messages/send', $payload)->assertStatus(401);
 
     $this->withHeaders(['X-Api-Secret' => 'wrong-secret'])
         ->postJson('/api/messages/send', $payload)
@@ -88,19 +133,30 @@ test('returns 401 unauthorized when X-Api-Secret header is missing or incorrect'
     $this->assertDatabaseCount('messages', 0);
 });
 
-test('returns 422 unprocessable content when request validation fails', function () {
+test('returns 422 unprocessable entity when text or template request validation fails', function () {
     Queue::fake();
-    
+
     $response = $this->withHeaders([
         'X-Api-Secret' => 'test-api-secret-123',
         'Accept' => 'application/json',
     ])->postJson('/api/messages/send', [
-        'phone_number' => '123',
+        'phone_number' => '',
         'message' => '',
     ]);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['phone_number', 'message']);
+
+    $templateResponse = $this->withHeaders([
+        'X-Api-Secret' => 'test-api-secret-123',
+        'Accept' => 'application/json',
+    ])->postJson('/api/messages/sendTemplate', [
+        'phone_number' => '5561999999999',
+        // missing required template_name
+    ]);
+
+    $templateResponse->assertStatus(422)
+        ->assertJsonValidationErrors(['template_name']);
 
     $this->assertDatabaseCount('messages', 0);
 });
