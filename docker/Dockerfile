@@ -32,3 +32,18 @@ COPY --from=build-assets /var/www/public/build ./public/build
 COPY --from=build-assets /var/www/vendor ./vendor
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache .
 USER www-data
+
+
+FROM base AS prod
+COPY --exclude=.env --exclude=.env.test . .
+COPY --from=build-assets /var/www/public/build ./public/build
+COPY --from=build-assets /var/www/vendor ./vendor
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache .
+USER www-data
+CMD ["php-fpm"]
+
+
+FROM nginx:alpine AS nginx
+COPY --from=build-assets /var/www/public /var/www/public
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /var/www
