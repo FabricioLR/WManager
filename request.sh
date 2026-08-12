@@ -26,11 +26,11 @@ curl -X POST "http://127.0.0.1:8000/api/whatsapp/webhook" \
             "messages": [
               {
                 "from": "16505551234",
-                "id": "wamid.HBgLMTY1MDM4Nzk0MzkVAgASGBQzQTRBNjU5OUFFRTAzODEwMTQ0RgT=",
-                "timestamp": "1786451423",
+                "id": "wamid.HBgLMTY1MDM4Nzk0MzkVAgASGBQzQTRBNjU5OUFFRTAzODEwMTQ0RgX=",
+                "timestamp": "1786562306",
                 "type": "text",
                 "text": {
-                  "body": "testeteste2222"
+                  "body": "test"
                 }
               }
             ]

@@ -23,7 +23,7 @@ class ProcessSentMessage implements ShouldQueue
 
         $phoneNumberId = config('services.whatsapp.phone_number_id', env("WHATSAPP_PHONE_ID"));
         $accessToken   = config('services.whatsapp.access_token', env("WHATSAPP_ACCESS_TOKEN"));
-        $apiVersion    = config('services.whatsapp.api_version', env("WHATSAPP_API_VERSION", 'v20.0'));
+        $apiVersion    = config('services.whatsapp.api_version', env("WHATSAPP_API_VERSION", 'v26.0'));
 
         if (!$phoneNumberId || !$accessToken) {
             Log::error("WhatsApp API credentials missing.");

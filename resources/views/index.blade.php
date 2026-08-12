@@ -14,11 +14,8 @@
     </style>
 </head>
 <body class="bg-slate-950 h-screen w-screen overflow-hidden font-sans antialiased flex text-slate-100" x-data="wmanager()">
-
-    <!-- ================= NOTIFICATION TOASTS ================= -->
     <div class="fixed top-5 right-5 z-50 space-y-3 max-w-sm w-full pointer-events-none">
-        
-        <!-- Error Toast -->
+
         @if(isset($error) || $errors->any())
             <div x-data="{ show: true }" 
                  x-show="show" 
@@ -39,7 +36,6 @@
             </div>
         @endif
 
-        <!-- Success Toast -->
         @if (session('success'))
             <div x-data="{ show: true }" 
                  x-show="show" 
@@ -62,12 +58,8 @@
 
     </div>
 
-    <!-- ================= MAIN LAYOUT ================= -->
     <div class="flex h-full w-full bg-slate-900 overflow-hidden">
-        
-        <!-- LEFT PANEL: Contacts Sidebar -->
         <aside class="w-full md:w-[380px] lg:w-[420px] bg-slate-900 border-r border-slate-800 flex flex-col h-full flex-shrink-0">
-            <!-- Header -->
             <div class="h-[60px] bg-slate-800/80 px-4 border-b border-slate-700/60 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm shadow-md">WA</div>
@@ -78,7 +70,6 @@
                 </button>
             </div>
 
-            <!-- Search Bar -->
             <div class="p-2.5 bg-slate-900 border-b border-slate-800 flex-shrink-0">
                 <div class="relative flex items-center">
                     <svg class="w-4 h-4 absolute left-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -86,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Contact List -->
             <div class="flex-1 overflow-y-auto divide-y divide-slate-800/50">
                 @forelse($contacts as $c)
                     @php 
@@ -119,10 +109,8 @@
             </div>
         </aside>
 
-        <!-- RIGHT PANEL: Chat Window -->
         <main class="hidden md:flex flex-1 bg-slate-950 flex-col h-full relative">
             @if(isset($contact))
-                <!-- Chat Header -->
                 <div class="h-[60px] bg-slate-900 px-4 border-b border-slate-800 flex justify-between items-center flex-shrink-0">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full bg-slate-800 text-emerald-400 border border-slate-700 flex items-center justify-center font-semibold text-sm">
@@ -135,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Messages Feed -->
                 <div id="messageContainer" class="flex-1 overflow-y-auto p-6 space-y-3 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]">
                     @foreach($messages as $msg)
                         <div class="flex {{ $msg->direction === 'inbound' ? 'justify-start' : 'justify-end' }}">
@@ -147,12 +134,30 @@
                                     </span>
                                     
                                     @if($msg->direction !== 'inbound')
-                                        @if($msg->status === 'read')
-                                            <svg class="w-3.5 h-3.5 text-sky-300" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                                        @if($msg->status === 'failed')
+                                            <svg class="w-3.5 h-3.5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @elseif($msg->status === 'sending')
+                                            <svg class="w-3.5 h-3.5 text-slate-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        @elseif($msg->status === 'sent')
+                                            <svg class="w-3.5 h-3.5 text-emerald-200 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
                                         @elseif($msg->status === 'delivered')
-                                            <svg class="w-3.5 h-3.5 text-emerald-200" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                                            <svg class="w-3.5 h-3.5 text-emerald-200" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M.41 13.41 6 19l1.41-1.41L1.83 12m4.58 4.59L18 5l-1.41-1.41M22.59 3.59 11 15.17l-3.59-3.58L6 13l5 5 13-13z"/>
+                                            </svg>
+                                        @elseif($msg->status === 'read')
+                                            <svg class="w-3.5 h-3.5 text-sky-300" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M.41 13.41 6 19l1.41-1.41L1.83 12m4.58 4.59L18 5l-1.41-1.41M22.59 3.59 11 15.17l-3.59-3.58L6 13l5 5 13-13z"/>
+                                            </svg>
                                         @else
-                                            <svg class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <svg class="w-3.5 h-3.5 text-emerald-200 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
                                         @endif
                                     @endif
                                 </div>
@@ -161,14 +166,12 @@
                     @endforeach
                 </div>
 
-                <!-- Footer / Messaging Box -->
                 @php
                     $isWithin24hWindow = $contact->last_message_from_contact_at && 
                         $contact->last_message_from_contact_at->greaterThanOrEqualTo(now()->subHours(24));
                 @endphp
 
                 @if($isWithin24hWindow)
-                    <!-- Free Text Form -->
                     <form @submit.prevent="sendMessage('{{ $contact->phone_number }}')" class="h-[62px] bg-slate-900 px-4 border-t border-slate-800 flex items-center space-x-3 flex-shrink-0">
                         <input type="text" x-model="newMessage" placeholder="Type a message..." :disabled="isSending" class="flex-1 bg-slate-800 text-slate-200 rounded-lg px-4 py-2 text-sm border border-slate-700/60 focus:outline-none focus:border-emerald-500 placeholder-slate-400 disabled:bg-slate-800/50">
                         <button type="submit" :disabled="isSending || !newMessage.trim()" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-full p-2.5 transition flex-shrink-0 shadow-md">
@@ -176,7 +179,6 @@
                         </button>
                     </form>
                 @else
-                    <!-- Template Selector Form -->
                     <div class="bg-amber-950/40 border-t border-amber-800/40 p-3 flex-shrink-0">
                         <div class="flex items-center space-x-2 text-amber-300 text-xs mb-2">
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -197,10 +199,8 @@
                                 </button>
                             </div>
 
-                            <!-- Template Parameter Inputs -->
                             <template x-if="selectedTemplateData">
                                 <div class="bg-slate-900 p-3 border border-slate-800 rounded-lg space-y-3 shadow-md">
-                                    <!-- Header Variables -->
                                     <template x-if="headerVariables.length > 0">
                                         <div>
                                             <span class="text-xs font-semibold text-slate-300 block mb-1">Header Parameters:</span>
@@ -215,7 +215,6 @@
                                         </div>
                                     </template>
 
-                                    <!-- Body Variables -->
                                     <template x-if="bodyVariables.length > 0">
                                         <div>
                                             <span class="text-xs font-semibold text-slate-300 block mb-1">Body Parameters:</span>
@@ -230,7 +229,6 @@
                                         </div>
                                     </template>
 
-                                    <!-- Live Preview -->
                                     <div class="border-t border-slate-800 pt-2">
                                         <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">Template Preview</span>
                                         <div class="bg-emerald-950/60 border border-emerald-800/40 p-2.5 rounded-lg text-xs text-slate-200 space-y-1">
@@ -251,7 +249,6 @@
                     </div>
                 @endif
             @else
-                <!-- No Active Chat Placeholder -->
                 <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-slate-900 border-b-8 border-emerald-500">
                     <div class="w-24 h-24 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-emerald-400 mb-6 shadow-xl">
                         <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
@@ -263,7 +260,6 @@
         </main>
     </div>
 
-    <!-- ================= ADD NEW CONTACT MODAL ================= -->
     <div x-show="showAddContactModal" x-cloak class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div @click.outside="showAddContactModal = false" class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md p-6">
             <h3 class="text-lg font-semibold text-slate-100 mb-4">Start New Chat</h3>
@@ -283,7 +279,6 @@
         </div>
     </div>
     
-    <!-- ================= ALPINE.JS APPLICATION STATE ================= -->
     <script>
         function wmanager() {
             return {
@@ -354,7 +349,6 @@
 
                     if (!this.selectedTemplateData) return;
 
-                    // Extract Header Variables
                     const header = this.getHeaderComponent();
                     if (header && header.format === 'TEXT' && header.text) {
                         const matches = header.text.match(/\{\{([^}]+)\}\}/g);
@@ -364,7 +358,6 @@
                         }
                     }
 
-                    // Extract Body Variables
                     const body = this.getBodyComponent();
                     if (body) {
                         if (this.selectedTemplateData.parameter_format === 'NAMED' && body.example?.body_text_named_params) {
@@ -472,7 +465,6 @@
                         });
 
                         if (response.ok) {
-                            // Reload window to fetch newly stored message from DB
                             window.location.reload();
                         } else {
                             alert('Failed to send message.');

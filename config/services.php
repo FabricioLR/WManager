@@ -20,6 +20,7 @@ return [
 
     'whatsapp' => [
         'phone_number_id' => env('WHATSAPP_PHONE_ID', ''),
+        'account_id' => env('WHATSAPP_ACCOUNT_ID', ''),
         'access_token'    => env('WHATSAPP_ACCESS_TOKEN', ''),
         'api_version'         => env('WHATSAPP_API_VERSION', 'v26.0'),
     ],
