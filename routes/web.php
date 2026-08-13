@@ -19,6 +19,10 @@ Route::middleware(['auth'])->group(function (){
 
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    Route::get('/docs', function (){
+        return view('docs');
+    })->name('docs');
+
     Route::middleware(['admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/user', [DashboardController::class, 'store'])->name('dashboard.user.store');
