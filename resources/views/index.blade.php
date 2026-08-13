@@ -65,9 +65,24 @@
                     <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm shadow-md">WA</div>
                     <span class="font-semibold text-slate-200 text-sm">Chats</span>
                 </div>
-                <button @click="showAddContactModal = true" title="New Chat" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-300 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                </button>
+
+                <!-- Header Actions (New Chat + Logout) -->
+                <div class="flex items-center space-x-1">
+                    <!-- New Chat Button -->
+                    <button @click="showAddContactModal = true" title="New Chat" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-300 hover:text-emerald-400 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+
+                    <!-- Logout Button -->
+                    <form action="{{ route('logout') }}" method="GET" class="inline">
+                        @csrf
+                        <button type="submit" title="Sign Out" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-400 hover:text-rose-400 transition flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div class="p-2.5 bg-slate-900 border-b border-slate-800 flex-shrink-0">
@@ -84,8 +99,8 @@
                         $isActive = isset($contact) && $contact->id === $c->id;
                     @endphp
                     <a href="{{ route('chat.show', $c->id) }}" 
-                       x-show="matchesSearch('{{ strtolower($c->name ?? $c->phone_number) }}')"
-                       class="flex items-center px-4 py-3 hover:bg-slate-800/50 transition cursor-pointer {{ $isActive ? 'bg-slate-800 border-l-4 border-emerald-500' : '' }}">
+                    x-show="matchesSearch('{{ strtolower($c->name ?? $c->phone_number) }}')"
+                    class="flex items-center px-4 py-3 hover:bg-slate-800/50 transition cursor-pointer {{ $isActive ? 'bg-slate-800 border-l-4 border-emerald-500' : '' }}">
                         <div class="w-11 h-11 rounded-full bg-slate-700 text-emerald-400 border border-slate-600 flex items-center justify-center font-bold text-base mr-3 flex-shrink-0">
                             {{ strtoupper(substr($c->name ?? $c->phone_number, 0, 2)) }}
                         </div>

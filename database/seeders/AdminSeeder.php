@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-class DatabaseSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     use WithoutModelEvents;
 
@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $username,
                 'password' => Hash::make($password),
                 'email_verified_at' => now(),
+                'is_admin' => true,
             ]
         );
 
