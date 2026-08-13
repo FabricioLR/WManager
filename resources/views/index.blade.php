@@ -155,14 +155,35 @@
 
                 <div id="messageContainer" class="flex-1 overflow-y-auto p-6 space-y-3 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]">
                     @foreach($messages as $msg)
-                        <div class="flex {{ $msg->direction === 'inbound' ? 'justify-start' : 'justify-end' }}">
-                            <div class="{{ $msg->direction === 'inbound' ? 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-tl-none' : 'bg-emerald-600 text-white rounded-tr-none' }} rounded-lg py-2 px-3.5 max-w-[70%] shadow-md">
-                                <p class="text-sm leading-relaxed break-words">{{ $msg->body }}</p>
+                        <div class="flex {{ $msg->direction === 'inbound' ? 'justify-start' : 'justify-end' }} mb-2">
+                            
+                            <div class="{{ $msg->direction === 'inbound' ? 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-tl-none' : 'bg-emerald-600 text-white rounded-tr-none' }} rounded-lg py-2 px-3.5 max-w-[70%] shadow-md"
+                                x-data="{ expanded: false, limit: 300 }">
+                                
+                                <div class="text-sm leading-relaxed break-all whitespace-pre-line">
+                                    @if(mb_strlen($msg->body) > 300)
+                                        <span x-show="!expanded">
+                                            {{ \Illuminate\Support\Str::limit($msg->body, 300) }}
+                                        </span>
+
+                                        <span x-show="expanded" x-cloak>
+                                            {{ $msg->body }}
+                                        </span>
+
+                                        <button @click="expanded = !expanded" 
+                                                class="block mt-1 text-xs font-semibold underline opacity-80 hover:opacity-100 transition">
+                                            <span x-text="expanded ? 'Show less' : 'Read more'"></span>
+                                        </button>
+                                    @else
+                                        {{ $msg->body }}
+                                    @endif
+                                </div>
+
                                 <div class="flex items-center justify-end space-x-1 mt-1">
                                     <span class="text-[10px] {{ $msg->direction === 'inbound' ? 'text-slate-400' : 'text-emerald-100' }}">
                                         {{ $msg->timestamp ? $msg->timestamp->format('H:i') : $msg->created_at->format('H:i') }}
                                     </span>
-                                    
+
                                     @if($msg->direction !== 'inbound')
                                         @if($msg->status === 'failed')
                                             <svg class="w-3.5 h-3.5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
@@ -181,7 +202,7 @@
                                                 <path d="M.41 13.41 6 19l1.41-1.41L1.83 12m4.58 4.59L18 5l-1.41-1.41M22.59 3.59 11 15.17l-3.59-3.58L6 13l5 5 13-13z"/>
                                             </svg>
                                         @elseif($msg->status === 'read')
-                                            <svg class="w-3.5 h-3.5 text-sky-300" fill="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-3.5 h-3.5 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M.41 13.41 6 19l1.41-1.41L1.83 12m4.58 4.59L18 5l-1.41-1.41M22.59 3.59 11 15.17l-3.59-3.58L6 13l5 5 13-13z"/>
                                             </svg>
                                         @else
@@ -191,6 +212,7 @@
                                         @endif
                                     @endif
                                 </div>
+
                             </div>
                         </div>
                     @endforeach

@@ -3,41 +3,43 @@
 curl -X POST "http://127.0.0.1:8000/api/whatsapp/webhook" \
   -H "Content-Type: application/json" \
   -d '{
-  "object": "whatsapp_business_account",
-  "entry": [
-    {
-      "id": "102290129340398",
-      "changes": [
+ "object": "whatsapp_business_account",
+      "entry": [
         {
-          "value": {
-            "messaging_product": "whatsapp",
-            "metadata": {
-              "display_phone_number": "15550783881",
-              "phone_number_id": "106540352242922"
-            },
-            "contacts": [
-              {
-                "profile": {
-                  "name": "Sheena Nelson2"
+          "id": "2003257443888225",
+          "changes": [
+            {
+              "value": {
+                "messaging_product": "whatsapp",
+                "metadata": {
+                  "display_phone_number": "556183450012",
+                  "phone_number_id": "1204821132713658"
                 },
-                "wa_id": "16505551234"
-              }
-            ],
-            "messages": [
-              {
-                "from": "16505551234",
-                "id": "wamid.HBgLMTY1MDM4Nzk0MzkVAgASGBQzQTRBNjU5OUFFRTAzODEwMTQ0RgX=",
-                "timestamp": "1786562306",
-                "type": "text",
-                "text": {
-                  "body": "test"
-                }
-              }
-            ]
-          },
-          "field": "messages"
+                "contacts": [
+                  {
+                    "wa_id": "556195798701",
+                    "user_id": "BR.2610227519432898"
+                  }
+                ],
+                "statuses": [
+                  {
+                    "id": "wamid.HBgMNTU2MTk1Nzk4NzAxFQIAERgSMTlCQkNGRTIyRDVDOTY5ODFFAA==",
+                    "status": "read",
+                    "timestamp": "1786645614",
+                    "recipient_id": "556195798701",
+                    "recipient_user_id": "BR.2610227519432898",
+                    "pricing": {
+                      "billable": false,
+                      "pricing_model": "PMP",
+                      "category": "service",
+                      "type": "free_customer_service"
+                    }
+                  }
+                ]
+              },
+              "field": "messages"
+            }
+          ]
         }
       ]
-    }
-  ]
 }'
