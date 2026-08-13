@@ -69,9 +69,15 @@
                 <!-- Header Actions (New Chat + Logout) -->
                 <div class="flex items-center space-x-1">
                     <!-- New Chat Button -->
-                    <button @click="showAddContactModal = true" title="New Chat" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-300 hover:text-emerald-400 transition">
+                    <button @click="showAddContactModal = true" title="New Contact" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-300 hover:text-emerald-400 transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     </button>
+
+                    <a href="{{ route('docs') }}" title="API Documentation" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-400 hover:text-sky-400 transition flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                    </a>
 
                     @if(auth()->check() && auth()->user()->is_admin)
                         <a href="{{ route('dashboard') }}" title="Admin Panel" class="p-2 hover:bg-slate-700/60 rounded-full text-slate-400 hover:text-amber-400 transition flex items-center justify-center">
@@ -286,7 +292,7 @@
 
     <div x-show="showAddContactModal" x-cloak class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div @click.outside="showAddContactModal = false" class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md p-6">
-            <h3 class="text-lg font-semibold text-slate-100 mb-4">Start New Chat</h3>
+            <h3 class="text-lg font-semibold text-slate-100 mb-4">Add New Contact</h3>
             <form action="{{ route('contact.store') }}" method="POST">
                 @csrf
                 <div class="space-y-4">
@@ -312,7 +318,7 @@
                 newContactPhone: '',
                 newContactMessage: '',
                 isSending: false,
-                apiSecret: '{{ config("services.api.secret_token") }}', 
+                apiSecret: '{{ auth()->user()->api_token }}', 
                 templates: [],
                 selectedTemplateName: '',
                 selectedTemplateData: null,

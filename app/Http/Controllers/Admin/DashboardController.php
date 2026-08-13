@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Exception;
 
 class DashboardController extends Controller
@@ -32,6 +33,7 @@ class DashboardController extends Controller
                 'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'is_admin' => $request->has('is_admin'),
+                'api_token' => Str::random(40)
             ]);
 
             return redirect()->route('dashboard')->with('success', 'User created successfully.');

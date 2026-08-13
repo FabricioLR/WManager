@@ -24,7 +24,27 @@
 
     <!-- Toast / Alert Floating Container -->
     <div class="fixed top-5 right-5 z-50 space-y-3 max-w-sm w-full pointer-events-none">
-        @if(session('success'))
+        @if(isset($error) || $errors->any())
+            <div x-data="{ show: true }" 
+                 x-show="show" 
+                 x-init="setTimeout(() => show = false, 5000)"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-x-2"
+                 x-transition:enter-end="opacity-100 translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-x-0"
+                 x-transition:leave-end="opacity-0 translate-x-2"
+                 class="pointer-events-auto bg-slate-800 border-l-4 border-rose-500 p-4 rounded-lg shadow-2xl flex items-start space-x-3 border border-slate-700">
+                <svg class="w-5 h-5 flex-shrink-0 text-rose-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-slate-200">Warning: Action encountered errors.</p>
+                    <p class="text-xs text-rose-400 mt-0.5">{{ $error ?? $errors->first() }}</p>
+                </div>
+                <button @click="show = false" class="text-slate-400 hover:text-slate-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+        @endif
+
+        @if (session('success'))
             <div x-data="{ show: true }" 
                  x-show="show" 
                  x-init="setTimeout(() => show = false, 5000)"
@@ -35,16 +55,12 @@
                  x-transition:leave-start="opacity-100 translate-x-0"
                  x-transition:leave-end="opacity-0 translate-x-2"
                  class="pointer-events-auto bg-slate-800 border-l-4 border-emerald-500 p-4 rounded-lg shadow-2xl flex items-start space-x-3 border border-slate-700">
-                <svg class="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <svg class="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <div class="flex-1">
                     <p class="text-sm font-semibold text-slate-200">Success</p>
                     <p class="text-xs text-emerald-400 mt-0.5">{{ session('success') }}</p>
                 </div>
-                <button @click="show = false" class="text-slate-400 hover:text-slate-200 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+                <button @click="show = false" class="text-slate-400 hover:text-slate-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
         @endif
     </div>
@@ -59,8 +75,7 @@
                     ADM
                 </div>
                 <div>
-                    <h1 class="font-semibold text-slate-200 text-sm">Admin Workspace</h1>
-                    <p class="text-[11px] text-slate-400">User Management & System Access</p>
+                    <h1 class="font-semibold text-slate-200 text-sm">Admin Dashboard</h1>
                 </div>
             </div>
 
@@ -129,6 +144,7 @@
                                 <th class="py-3 px-4">User</th>
                                 <th class="py-3 px-4">Email</th>
                                 <th class="py-3 px-4">Role</th>
+                                <th class="py-3 px-4">Api Token</th>
                                 <th class="py-3 px-4">Created At</th>
                             </tr>
                         </thead>
@@ -152,6 +168,27 @@
                                                 User
                                             </span>
                                         @endif
+                                    </td>
+                                    <td class="py-3 px-4 text-slate-400 font-mono text-xs" x-data="{ copied: false }">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="truncate max-w-[140px]" title="{{ $u->api_token }}">{{ $u->api_token }}</span>
+                                            
+                                            <!-- Copy Button -->
+                                            <button @click="navigator.clipboard.writeText('{{ $u->api_token }}'); copied = true; setTimeout(() => copied = false, 2000)" 
+                                                    class="p-1.5 hover:bg-slate-800 rounded-md text-slate-400 hover:text-emerald-400 transition flex-shrink-0" 
+                                                    title="Copy API Token">
+                                                
+                                                <!-- Default Clipboard Icon -->
+                                                <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+
+                                                <!-- Success Checkmark Icon -->
+                                                <svg x-show="copied" x-cloak class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td class="py-3 px-4 text-slate-400">
                                         {{ $u->created_at ? $u->created_at->format('M d, Y H:i') : 'N/A' }}
