@@ -10,7 +10,7 @@ class CheckApiSecretToken
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $secretToken = config('services.api.secret_token', env('API_SECRET_TOKEN', ''));
+        $secretToken = config('admin.api_token', env('ADMIN_API_TOKEN', '123456'));
         $providedToken = $request->header('X-Api-Secret');
 
         if (empty($secretToken) || $providedToken !== $secretToken) {

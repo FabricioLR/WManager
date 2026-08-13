@@ -14,10 +14,6 @@ return [
     |
     */
 
-    'api' => [
-        'secret_token' => env('API_SECRET_TOKEN', ''),
-    ],
-
     'whatsapp' => [
         'phone_number_id' => env('WHATSAPP_PHONE_ID', ''),
         'account_id' => env('WHATSAPP_ACCOUNT_ID', ''),
